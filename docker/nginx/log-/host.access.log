@@ -1,0 +1,2 @@
+172.18.0.1 - - [14/Mar/2022:11:09:18 +0000] "GET / HTTP/1.1" 200 12 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36" "172.18.0.1"
+172.18.0.1 - - [14/Mar/2022:11:09:19 +0000] "GET /favicon.ico HTTP/1.1" 200 12 "http://dev1api.local/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36" "172.18.0.1"

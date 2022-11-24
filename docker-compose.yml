@@ -1,0 +1,114 @@
+version: '3.9'
+
+services:
+  
+  ### PHP #################################
+  app:
+    image: www-php:8
+    container_name: php8-php
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+      args:
+        DOCKER_PHP_VERSION: '8'
+        TZ: ${TZ}
+        PUNAME: ${WORKSPACE_PUNAME}
+        PUID: ${WORKSPACE_PUID:-1000}
+        PGID: ${WORKSPACE_PGID:-1000}
+    user: 'root:root'
+    working_dir: /var/www/
+    volumes:
+      - ./docker/php/php/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php/php/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./docker/php/supervisord.d:/etc/supervisord.d
+      - ./html/:/var/www/html/
+      - dandar-home:/home
+      - dandar-root:/root
+    environment:
+      # APP_ENV: local
+      CONTAINER_ROLE: supervisor
+    hostname: app
+    depends_on:
+      - mariadb
+    networks:
+      - backend
+
+  ### nginx #################################
+  nginx:
+    image: nginx
+    # container_name: "nginx"
+    environment:
+      - VIRTUAL_HOST=dandar.local
+    depends_on:
+      - mariadb
+    hostname: nginx
+    volumes:
+      - ./docker/nginx/conf.d/default.nginx:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/conf.d/real_ip.conf:/etc/nginx/conf.d/real_ip.conf
+      - ./docker/nginx/log-/:/var/log/nginx/
+      - ./html/:/var/www/html/
+    networks:
+      - frontend
+      - backend
+
+  ### MariaDB ##############################################
+  mariadb:
+    build:
+      context: ./docker/mariadb
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - MARIADB_VERSION=${MARIADB_VERSION}
+    volumes:
+      - dandar-db:/var/lib/mysql
+      - ${MARIADB_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+    # ports:
+    #   - "${MARIADB_PORT}:3306"
+    hostname: mysql
+    environment:
+      - TZ=${WORKSPACE_TIMEZONE}
+      - MYSQL_DATABASE=${MARIADB_DATABASE}
+      - MYSQL_USER=${MARIADB_USER}
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    networks:
+      - backend
+
+  ### phpMyAdmin ###########################################
+  phpmyadmin:
+    build: ./docker/phpmyadmin
+    # image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - VIRTUAL_HOST=pma.dandar.local
+      - PMA_HOST=mysql
+      # - PMA_ARBITRARY=1
+      - MYSQL_USER=${PMA_USER}
+      - MYSQL_PASSWORD=${PMA_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${PMA_ROOT_PASSWORD}
+      - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME}
+      - MEMORY_LIMIT=${PMA_MEMORY_LIMIT}
+      - UPLOAD_LIMIT=${PMA_UPLOAD_LIMIT}
+    # ports:
+    #   - "${PMA_PORT}:80"
+    hostname: phpmyadmin
+    # extra_hosts:
+    #   - "mysql:192.168.0.2"
+    depends_on:
+      - "${PMA_DB_ENGINE}"
+    networks:
+      - frontend
+      - backend
+
+####################################################
+volumes:
+  dandar-home:
+  dandar-root:
+  dandar-db:
+
+####################################################
+networks:
+  frontend:
+    external: true
+    name: proxy_nginx
+  backend:

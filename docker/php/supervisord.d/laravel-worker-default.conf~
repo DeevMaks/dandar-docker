@@ -1,0 +1,16 @@
+[program:laravel-worker-default]
+process_name=%(program_name)s_%(process_num)02d
+#directory=/var/www/html/
+command=php /var/www/html/artisan queue:work --queue=default --verbose --sleep=1 --tries=1 --timeout=900
+autostart=true
+autorestart=true
+numprocs=1
+user=web
+redirect_stderr=true
+# stderr_logfile=/var/www/html_nakanune.ru/adm02/storage/logs/worker-err.log
+# stderr_logfile_maxbytes=1MB
+# stderr_logfile_backups=5
+# stdout_logfile=/var/www/html_nakanune.ru/adm02/storage/logs/worker.log
+# stdout_logfile_maxbytes=1MB
+# stdout_logfile_backups=5
+# stopwaitsecs=3600

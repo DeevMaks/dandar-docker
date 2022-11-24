@@ -1,0 +1,41 @@
+[core]
+	editor = mcedit
+	autocrlf = false
+	#autocrlf = input
+	quotepath = false
+[color]
+	ui = true
+[alias]
+	pushwww = push origin local:www
+	unstage = reset HEAD --
+	last = log -1 HEAD
+	st = status
+	uncommit = reset --hard
+	lastdiff = diff HEAD~
+	log2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
+	log3 = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim magenta)%an%C(reset)%C(bold yellow)%d%C(reset)'
+	loga = !"git log3 --all"
+	logg = !"git log3"
+	logf = log --name-status
+	co = checkout
+	br = branch
+	cm = commit
+	find = log --diff-filter=A --
+	cd = checkout
+	dir = branch
+	mersq = merge --squash
+	free = branch -D
+	save = stash push
+	pop = stash pop
+	snapshot = !git stash push "snapshot: $(date)" && git stash apply "stash@{0}"
+	branches = branch -a
+	tags = tag -n1 --list
+	stashes = stash list
+[merge]
+	conflictstyle = diff3
+[pull]
+	rebase = true
+[push]
+	default = current
+[rerere]
+	enabled = true
